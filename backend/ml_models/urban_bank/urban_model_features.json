@@ -1,0 +1,31 @@
+{
+    "module": "urban_bank",
+    "model_type": "xgboost",
+    "features": [
+        "EXT_SOURCE_MEAN",
+        "NAME_EDUCATION_TYPE_Higher education",
+        "CODE_GENDER",
+        "NAME_INCOME_TYPE_Working",
+        "CC_UTILISATION_RATIO",
+        "NAME_INCOME_TYPE_Pensioner",
+        "INSTAL_LATE_RATE",
+        "FLAG_DOCUMENT_3",
+        "NAME_CONTRACT_TYPE",
+        "FLAG_OWN_CAR",
+        "PREV_REFUSAL_RATE",
+        "NAME_EDUCATION_TYPE_Secondary / secondary special",
+        "APARTMENTS_MEDI",
+        "CREDIT_TERM",
+        "PREV_APPROVED_COUNT",
+        "EXT_SOURCE_MIN",
+        "CC_AVG_BALANCE",
+        "EXT_SOURCE_1",
+        "REG_CITY_NOT_LIVE_CITY",
+        "DEF_60_CNT_SOCIAL_CIRCLE"
+    ],
+    "feature_count": 20,
+    "metrics": {
+        "roc_auc": 0.7627,
+        "pr_auc": 0.2473
+    }
+}
