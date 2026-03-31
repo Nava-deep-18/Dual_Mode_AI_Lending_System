@@ -1,0 +1,26 @@
+{
+    "module": "rural_microfinance",
+    "model_type": "xgboost",
+    "features": [
+        "DTI_ratio",
+        "young_dependents",
+        "social_class_OBC",
+        "loan_purpose_Eateries",
+        "secondary_business_Other",
+        "water_availabity",
+        "social_class_Minority",
+        "social_class_SC",
+        "total_dependents",
+        "loan_installments",
+        "old_dependents",
+        "primary_business_Other",
+        "loan_purpose_Business Services - II",
+        "primary_business_Food_Trade",
+        "type_of_house_Other"
+    ],
+    "feature_count": 15,
+    "metrics": {
+        "roc_auc": 0.9936,
+        "pr_auc": 0.9492
+    }
+}
