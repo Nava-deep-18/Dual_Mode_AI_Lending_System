@@ -88,6 +88,79 @@ RURAL_SHAP_DICTIONARY = {
     }
 }
 
+URBAN_SHAP_DICTIONARY = {
+    "EXT_SOURCE_MEAN": {
+        "label": "Average External Credit Score",
+        "red_flag": "Poor historical credit behavior detected across external bureaus.",
+        "green_flag": "Strong aggregate credit score from external bureaus."
+    },
+    "EXT_SOURCE_MIN": {
+        "label": "Lowest External Credit Score",
+        "red_flag": "At least one credit bureau reported severe delinquency.",
+        "green_flag": "No severe delinquencies reported across any bureau."
+    },
+    "EXT_SOURCE_1": {
+        "label": "Primary External Credit Score",
+        "red_flag": "Low primary credit rating indicates likely default.",
+        "green_flag": "High primary credit rating secures the application."
+    },
+    "CC_UTILISATION_RATIO": {
+        "label": "Credit Card Utilization",
+        "red_flag": "Over-leveraged credit facilities indicate extreme debt stress.",
+        "green_flag": "Healthy credit utilization leaves room for new debt."
+    },
+    "INSTAL_LATE_RATE": {
+        "label": "Late Payment History",
+        "red_flag": "History of missing previous installments.",
+        "green_flag": "Flawless historical repayment behavior."
+    },
+    "CREDIT_TERM": {
+        "label": "Loan Term Length",
+        "red_flag": "Extended loan term increases cumulative risk exposure.",
+        "green_flag": "Short term loan limit exposure."
+    },
+    "PREV_REFUSAL_RATE": {
+        "label": "Previous Refusal Rate",
+        "red_flag": "Frequent rejections by other financial institutions.",
+        "green_flag": "Strong approval history."
+    },
+    "APARTMENTS_MEDI": {
+        "label": "Apartment Size/Quality",
+        "red_flag": "Low housing metric indicates poor standard of living collateral.",
+        "green_flag": "High housing metric correlates with financial stability."
+    },
+    "PREV_APPROVED_COUNT": {
+        "label": "Previous Approved Loans",
+        "red_flag": "Lack of proven credit history.",
+        "green_flag": "Extensive history of successfully approved loans."
+    },
+    "CC_AVG_BALANCE": {
+        "label": "Average Credit Balance",
+        "red_flag": "Consistently high revolving credit balance.",
+        "green_flag": "Low or zero revolving balances."
+    },
+    "NAME_EDUCATION_TYPE_Higher education": {
+        "label": "Education Level (Degree)",
+        "red_flag": "Lack of higher education correlates with income ceilings.",
+        "green_flag": "Higher education correlates with stable employment."
+    },
+    "NAME_INCOME_TYPE_Working": {
+        "label": "Income Type (Salaried)",
+        "red_flag": "Unstable employment type.",
+        "green_flag": "Stable W2/Salaried income."
+    },
+    "FLAG_DOCUMENT_3": {
+        "label": "ID Verification Level 3",
+        "red_flag": "Missing critical documentation increases fraud risk.",
+        "green_flag": "Fully verified standard documents."
+    },
+    "FLAG_OWN_CAR": {
+        "label": "Car Ownership (Asset)",
+        "red_flag": "Lack of vehicle ownership reduces recoverable assets.",
+        "green_flag": "Vehicle ownership serves as excellent implicit collateral."
+    }
+}
+
 class MLEngine:
     def __init__(self):
         print("Initializing Machine Learning Engine...")
@@ -104,6 +177,19 @@ class MLEngine:
         else:
             self.rural_model = None
             print("⚠️ Rural Model missing!")
+
+        # 2. Load Urban Model & Config
+        urban_path = os.path.join(MODELS_DIR, "urban_bank", "urban_xgb_model.joblib")
+        urban_feat = os.path.join(MODELS_DIR, "urban_bank", "urban_model_features.json")
+        
+        if os.path.exists(urban_path):
+            self.urban_model = joblib.load(urban_path)
+            self.urban_explainer = shap.TreeExplainer(self.urban_model)
+            with open(urban_feat, 'r') as f:
+                self.urban_features = json.load(f)["features"]
+        else:
+            self.urban_model = None
+            print("⚠️ Urban Model missing!")
 
     def _transform_rural_inputs(self, raw: RuralHumanInput) -> dict:
         """Converts raw human text into the exact XGBoost features securely"""
@@ -201,6 +287,51 @@ class MLEngine:
             tier, decision = "High Risk", "Manual Review Required"
         elif prob > 40.0:
             tier, decision = "Medium Risk", "Review Conditions"
+            
+        return {
+            "risk_score": round(prob, 2),
+            "risk_tier": tier,
+            "decision": decision,
+            "shap_explanations": shaps_human
+        }
+
+    def predict_urban(self, bureau_raw) -> dict:
+        if not self.urban_model:
+            raise Exception("Urban Model not available")
+            
+        # Pydantic's model_dump(by_alias=True) converts Pythonic names back to XGBoost strings 
+        # (e.g. NAME_EDUCATION_TYPE_Secondary -> NAME_EDUCATION_TYPE_Secondary / secondary special)
+        model_ready_data = bureau_raw.model_dump(by_alias=True)
+        
+        df = pd.DataFrame([model_ready_data])[self.urban_features]
+        prob = float(self.urban_model.predict_proba(df)[0][1]) * 100
+        prob = max(prob, 0.0001)
+        
+        shap_values = self.urban_explainer.shap_values(df)
+        feature_impacts = {self.urban_features[i]: float(shap_values[0][i]) for i in range(len(self.urban_features))}
+        sorted_impacts = sorted(feature_impacts.items(), key=lambda item: abs(item[1]), reverse=True)
+        
+        shaps_human = []
+        for feat, impact_val in sorted_impacts[:4]:
+            direction = "HIGH RISK" if impact_val > 0 else "LOW RISK"
+            dict_ref = URBAN_SHAP_DICTIONARY.get(feat, {
+                "label": feat,
+                "red_flag": f"The value of {feat} significantly increased default probability.",
+                "green_flag": f"The value of {feat} actively reduced risk."
+            })
+            shaps_human.append({
+                "feature": feat,
+                "human_label": dict_ref["label"],
+                "impact": direction,
+                "reason": dict_ref["red_flag"] if direction == "HIGH RISK" else dict_ref["green_flag"]
+            })
+            
+        tier = "Safe"
+        decision = "Approved"
+        if prob > 60.0:
+            tier, decision = "High Risk", "Manual Review Required"
+        elif prob > 35.0:
+            tier, decision = "Medium Risk", "Request Collateral"
             
         return {
             "risk_score": round(prob, 2),

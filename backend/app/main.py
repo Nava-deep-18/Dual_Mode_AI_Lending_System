@@ -38,6 +38,7 @@ def predict_urban_risk(request: UrbanBureauInput):
     """
     Evaluates an Urban Commercial Base applicant using Bureau aggregate data.
     """
-    # NOTE: Urban routing follows the same structure. Right now, it's just a placeholder 
-    # until we build out the Urban SHAP dictionary.
-    raise HTTPException(status_code=501, detail="Urban mapping dictionary in development")
+    try:
+        return ml_engine.predict_urban(request)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
