@@ -39,16 +39,26 @@ The system is split into two distinct modules, ensuring that the machine learnin
 
 ## 🚦 Phased Development Plan
 
-*   **Phase 1: Data & Modeling (Data Science)**
+*   **Phase 1: Data & Modeling (Data Science) [COMPLETED]**
     *   Acquire Urban dataset (Traditional) and Rural dataset (Alternative).
     *   Setup `notebooks/` to clean, engineer features, and handle class imbalances.
     *   Train Model A and Model B; compute SHAP explainers; save models to `backend/ml_models/`.
-*   **Phase 2: Backend Development (API Route)**
-    *   Build FastAPI application to wrap the models and expose inference endpoints.
-*   **Phase 3: Frontend Development (The Portal)**
-    *   Build the React architecture with the dual landing pages.
-    *   Connect forms to the backend API.
-*   **Phase 4: Decision Support & Polish (Explainability)**
-    *   Build the UI components that graphically show the SHAP values (e.g., "Risk is high because: Debt is 40% of income").
+
+*   **Phase 2: Backend Development (API Route) [COMPLETED]**
+    *   Build FastAPI application to wrap the models and expose inference endpoints (`/api/predict/urban`, `/api/predict/rural`).
+    *   Build the `ml_service.py` SHAP Translation dictionary.
+
+*   **Phase 3: Database & Persistence Layer [NEXT]**
+    *   Implement SQLite and SQLAlchemy (`database.py`, `models.py`) to log every API prediction.
+    *   Save variables: Timestamp, Loan Type, Raw Input Data, Risk Score, and Decision to establish an audit trail.
+
+*   **Phase 4: Frontend Development (React + Vite) [PENDING]**
+    *   Build the Dual-Mode landing page (Urban Bank vs Rural MFI).
+    *   **Rural UI:** Simple input forms taking human-readable data (e.g., Dependents, Income, Crop Yield).
+    *   **Urban UI (The Wizard of Oz Pattern):** Simulate an enterprise CIBIL request. Let users fetch a dummy persona (e.g., Safe vs Risky) to automatically populate the complex JSON features, while adding editable sliders to override the populated data for infinite AI testing.
+
+*   **Phase 5: Decision Support & Polish (Explainability) [PENDING]**
+    *   Build the interactive SHAP Dashboard. Map the API response into visual glowing UI alerts ("Risk is high because: Credit Card Utilization > 90%").
+    *   Display the Database Audit Log page for managers to review historical decisions.
 
 *(Note: Dynamic Retraining / Time-series behavioral scoring is out-of-scope for Version 1, but UI room is left for "Borrower Tracking" later).*
