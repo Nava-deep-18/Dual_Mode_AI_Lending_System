@@ -1,19 +1,11 @@
 import React from 'react'
 import { Routes, Route, Link } from 'react-router-dom'
 import './index.css'
+import RuralApp from './RuralApp.jsx'
 
 // -----------------------------------------
 // PLACEHOLDER COMPONENTS (To be built next)
 // -----------------------------------------
-const RuralApp = () => (
-  <div className="app-container">
-    <Link to="/" style={{ color: "var(--accent-blue)", textDecoration: "none" }}>← Back to Portal</Link>
-    <div className="glass-panel" style={{ marginTop: "2rem" }}>
-      <h2>🌾 Rural Microfinance Dashboard</h2>
-      <p>The manual data-entry form will be built here.</p>
-    </div>
-  </div>
-);
 
 const UrbanApp = () => (
   <div className="app-container">
