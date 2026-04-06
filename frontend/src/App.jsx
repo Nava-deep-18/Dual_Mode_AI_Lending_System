@@ -2,20 +2,8 @@ import React from 'react'
 import { Routes, Route, Link } from 'react-router-dom'
 import './index.css'
 import RuralApp from './RuralApp.jsx'
+import UrbanApp from './UrbanApp.jsx'
 
-// -----------------------------------------
-// PLACEHOLDER COMPONENTS (To be built next)
-// -----------------------------------------
-
-const UrbanApp = () => (
-  <div className="app-container">
-    <Link to="/" style={{ color: "var(--accent-blue)", textDecoration: "none" }}>← Back to Portal</Link>
-    <div className="glass-panel" style={{ marginTop: "2rem" }}>
-      <h2>🏙️ Urban Commercial Dashboard</h2>
-      <p>The simulated CIBIL fetch and override sliders will be built here.</p>
-    </div>
-  </div>
-);
 
 // -----------------------------------------
 // LANDING PAGE (The Portal)
