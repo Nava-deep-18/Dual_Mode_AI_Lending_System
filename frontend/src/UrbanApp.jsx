@@ -252,7 +252,7 @@ const UrbanApp = () => {
               <button 
                 onClick={submitEvaluation} 
                 className="btn-primary" 
-                style={{ width: "100%", background: "linear-gradient(135deg, #10b981, #059669)", fontSize: "1.1rem", padding: "1rem" }}
+                style={{ width: "100%", fontSize: "1.2rem", padding: "1rem", marginTop: "1rem" }}
                 disabled={evaluating}
               >
                 {evaluating ? "Running AI Core..." : "Execute AI Evaluation"}
