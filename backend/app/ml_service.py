@@ -47,7 +47,7 @@ RURAL_SHAP_DICTIONARY = {
     },
     "type_of_house_Pucca": {
         "label": "Premium House Quality (Pucca)",
-        "red_flag": "N/A",
+        "red_flag": "Despite concrete housing, other localized neighborhood factors increased risk.",
         "green_flag": "High quality concrete housing implies robust financial backing."
     },
     # Business & Loan Purpose specific mappings (Neutral phrasing for One-Hot Explanations)
@@ -263,8 +263,27 @@ class MLEngine:
         
         # 4. Translate top 3 SHAP impacts into Human Text Responses
         shaps_human = []
-        for feat, impact_val in sorted_impacts[:4]: # Grab top 4 drivers
-            # Positive shap drives risk UP (Red flag), Negative drives risk DOWN (Green flag)
+        seen_categorical_bases = set()
+        
+        for feat, impact_val in sorted_impacts:
+            # If this is a one-hot categorical feature that the user did NOT select (value is 0)
+            # We MUST mathematically ignore it for the UI. Otherwise humans get confused when told "Low Risk because you aren't a butcher".
+            is_categorical = any(feat.startswith(p) for p in ['type_of_house_', 'primary_business_', 'loan_purpose_', 'social_class_'])
+            if is_categorical and model_ready_data.get(feat, 0.0) == 0.0:
+                continue
+                
+            # Prevent showing multiple one-hot variants of the same dropdown (e.g., House Type)
+            base_category = feat
+            for prefix in ['type_of_house_', 'primary_business_', 'loan_purpose_', 'social_class_']:
+                if feat.startswith(prefix):
+                    base_category = prefix
+                    break
+                    
+            if base_category in seen_categorical_bases and base_category != feat:
+                 continue
+                 
+            seen_categorical_bases.add(base_category)
+                 
             direction = "HIGH RISK" if impact_val > 0 else "LOW RISK"
             
             dict_ref = RURAL_SHAP_DICTIONARY.get(feat, {
@@ -279,6 +298,9 @@ class MLEngine:
                 "impact": direction,
                 "reason": dict_ref["red_flag"] if direction == "HIGH RISK" else dict_ref["green_flag"]
             })
+            
+            if len(shaps_human) >= 4:
+                break
             
         # 5. Apply Organic Guardrail Penalty (Dynamic Scaling)
         # We scale the penalty based on EXACTLY how bad their cash flow deficit is.
@@ -310,6 +332,16 @@ class MLEngine:
                 "reason": f"Requested EMI consumes an unsafe {int(dti_ratio*100)}% of disposable income."
             })
             
+        # Target Math for Dynamic Loan Caps and Rates
+        net_income_calculated = (human_raw.annual_income / 12.0) - human_raw.monthly_expenses
+        max_emi_capacity = max(net_income_calculated * 0.40, 0) # 40% of disposable
+        max_loan_limit = max_emi_capacity * 36 # Assumes standard 3-year microfinance term
+        
+        # Real-world MFI (Microfinance) rates typically start at 12% up to 24% for unsecured lending
+        base_rate = 12.0
+        risk_premium = min((prob / 100.0) * 12.0, 12.0) # Up to 12% extra based on risk profile
+        suggested_rate = base_rate + risk_premium
+
         # Business Logic Routing
         tier = "Safe"
         decision = "Approved"
@@ -322,6 +354,8 @@ class MLEngine:
             "risk_score": round(prob, 2),
             "risk_tier": tier,
             "decision": decision,
+            "suggested_interest_rate": round(suggested_rate, 2),
+            "max_loan_limit": round(max_loan_limit, 2),
             "shap_explanations": shaps_human
         }
 
@@ -356,6 +390,14 @@ class MLEngine:
                 "reason": dict_ref["red_flag"] if direction == "HIGH RISK" else dict_ref["green_flag"]
             })
             
+        # Proxied math for commercial exposure
+        max_loan_limit = (bureau_raw.EXT_SOURCE_MEAN ** 2) * 2500000 # Max ₹25,00,000 corporate limit
+        
+        # Realistic Urban Commercial banking starts around 9.5% 
+        base_rate = 9.5
+        risk_premium = min((prob / 100.0) * 10.5, 10.5) # Max out at 20%
+        suggested_rate = base_rate + risk_premium
+
         tier = "Safe"
         decision = "Approved"
         if prob > 60.0:
@@ -367,6 +409,8 @@ class MLEngine:
             "risk_score": round(prob, 2),
             "risk_tier": tier,
             "decision": decision,
+            "suggested_interest_rate": round(suggested_rate, 2),
+            "max_loan_limit": round(max_loan_limit, 2),
             "shap_explanations": shaps_human
         }
 

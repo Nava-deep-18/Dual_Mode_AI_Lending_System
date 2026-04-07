@@ -12,6 +12,8 @@ class PredictionResponse(BaseModel):
     risk_score: float
     risk_tier: str
     decision: str
+    suggested_interest_rate: Optional[float] = None
+    max_loan_limit: Optional[float] = None
     shap_explanations: List[ShapExplanation]
 
 # --- RURAL HUMAN INPUT SCHEMA ---

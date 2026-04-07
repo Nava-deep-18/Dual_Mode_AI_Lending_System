@@ -179,8 +179,8 @@ const RuralApp = () => {
           {result && (
             <>
               {/* Risk Score Gauge Component */}
-              <div className="glass-panel" style={{ 
-                borderTop: `6px solid ${result.risk_score > 60 ? '#ef4444' : result.risk_score > 35 ? '#f59e0b' : '#10b981'}`
+              <div className="card" style={{ 
+                borderTop: `6px solid ${result.risk_score > 60 ? '#ef4444' : result.risk_score > 35 ? '#f59e0b' : 'var(--neon-green)'}`
               }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <div>
@@ -193,11 +193,22 @@ const RuralApp = () => {
                      <h3 style={{ fontSize: "1.5rem", marginTop: "10px", color: "white" }}>{result.decision}</h3>
                   </div>
                 </div>
+
+                <div style={{ marginTop: "1.5rem", paddingTop: "1.5rem", borderTop: "1px solid rgba(255,255,255,0.1)", display: "flex", justifyContent: "space-between" }}>
+                  <div>
+                    <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", textTransform: "uppercase" }}>Max Safe Limit</div>
+                    <h3 style={{ fontSize: "1.25rem", marginTop: "5px", color: "white" }}>₹{result.max_loan_limit ? result.max_loan_limit.toLocaleString() : "0"}</h3>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", textTransform: "uppercase" }}>AI Suggested Rate</div>
+                    <h3 style={{ fontSize: "1.25rem", marginTop: "5px", color: "var(--neon-green)" }}>{result.suggested_interest_rate ? result.suggested_interest_rate.toFixed(2) : "0"}% APR</h3>
+                  </div>
+                </div>
               </div>
 
               {/* Explainable AI Component */}
-              <div className="glass-panel">
-                 <h3 style={{ marginBottom: "1rem" }}>🤖 AI Insights (SHAP)</h3>
+              <div className="card">
+                 <h3 style={{ marginBottom: "1rem", color: "white" }}>🤖 AI Insights (SHAP)</h3>
                  <p style={{ fontSize: "0.85rem", marginBottom: "1.5rem" }}>The model flagged these primary drivers behind the Risk Score:</p>
                  
                  <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -205,16 +216,16 @@ const RuralApp = () => {
                      <div key={index} style={{ 
                        padding: "12px", 
                        borderRadius: "8px", 
-                       background: "rgba(0,0,0,0.3)",
-                       borderLeft: `4px solid ${item.impact === "HIGH RISK" ? '#ef4444' : '#10b981'}`
+                       background: "var(--bg-main)",
+                       borderLeft: `4px solid ${item.impact === "HIGH RISK" ? '#ef4444' : 'var(--neon-green)'}`
                      }}>
                        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
                          <span style={{ fontWeight: "600" }}>{item.human_label}</span>
-                         <span style={{ fontSize: "0.8rem", color: item.impact === "HIGH RISK" ? '#ef4444' : '#10b981', fontWeight: "bold" }}>
+                         <span style={{ fontSize: "0.8rem", color: item.impact === "HIGH RISK" ? '#ef4444' : 'var(--neon-green)', fontWeight: "bold" }}>
                            {item.impact}
                          </span>
                        </div>
-                       <p style={{ fontSize: "0.9rem", color: "var(--text-muted)" }}>{item.reason}</p>
+                       <p style={{ fontSize: "0.9rem", color: "var(--text-muted)", margin: 0 }}>{item.reason}</p>
                      </div>
                    ))}
                  </div>
