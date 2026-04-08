@@ -4,6 +4,7 @@ import { Users, Activity } from 'lucide-react'
 import './index.css'
 import RuralApp from './RuralApp.jsx'
 import UrbanApp from './UrbanApp.jsx'
+import AuditDashboard from './AuditDashboard.jsx'
 
 const Navbar = () => {
   const location = useLocation();
@@ -86,18 +87,7 @@ const App = () => {
           <Route path="/" element={<DashboardHome />} />
           <Route path="/rural" element={<RuralApp />} />
           <Route path="/urban" element={<UrbanApp />} />
-          <Route path="/compliance" element={
-            <div style={{ maxWidth: "800px", margin: "0 auto" }}>
-               <div className="page-header">
-                 <h1>Compliance & Ethics</h1>
-                 <p>AI Bias Reporting Dashboard</p>
-               </div>
-               <div className="card">
-                 <h3 style={{margin:0}}>Module In Development</h3>
-                 <p style={{marginTop: '10px'}}>This module will surface historical AI approvals vs demographic proxies soon.</p>
-               </div>
-            </div>
-          } />
+          <Route path="/compliance" element={<AuditDashboard />} />
         </Routes>
       </div>
     </div>

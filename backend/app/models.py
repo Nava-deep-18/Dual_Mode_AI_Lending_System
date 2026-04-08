@@ -18,3 +18,5 @@ class LoanRecord(Base):
     risk_score = Column(Float)
     risk_tier = Column(String)
     decision = Column(String)
+    suggested_interest_rate = Column(Float, nullable=True)
+    max_loan_limit = Column(Float, nullable=True)

@@ -35,7 +35,9 @@ def log_to_database(db: Session, module_name: str, raw_input: str, result: dict)
         raw_input_data=raw_input,
         risk_score=result["risk_score"],
         risk_tier=result["risk_tier"],
-        decision=result["decision"]
+        decision=result["decision"],
+        suggested_interest_rate=result.get("suggested_interest_rate"),
+        max_loan_limit=result.get("max_loan_limit")
     )
     db.add(record)
     db.commit()
