@@ -1,6 +1,15 @@
 from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional
 
+# --- AUTHENTICATION SCHEMAS ---
+class UserCreate(BaseModel):
+    email: str
+    password: str
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
 # --- SHAP Explanation Output Schema ---
 class ShapExplanation(BaseModel):
     feature: str
@@ -20,6 +29,7 @@ class PredictionResponse(BaseModel):
 # We use Pydantic to ensure all strings like "30" become integers/floats, 
 # and we add strict validators to handle extreme cases.
 class RuralHumanInput(BaseModel):
+    borrower_name: str = "Anonymous"
     annual_income: float = Field(..., description="Annual Income in Rupees")
     monthly_expenses: float = Field(..., description="Monthly basic expenses")
     loan_installments: float = Field(..., description="Proposed monthly loan EMI")
@@ -53,6 +63,7 @@ class RuralHumanInput(BaseModel):
 # Urban modeling uses aggregated bureau features (Credit history, external sources)
 # The bank's database provides these 20 precise metrics.
 class UrbanBureauInput(BaseModel):
+    borrower_name: str = "Anonymous"
     EXT_SOURCE_MEAN: float = 0.5
     NAME_EDUCATION_TYPE_Higher_education: int = Field(0, alias="NAME_EDUCATION_TYPE_Higher education")
     CODE_GENDER: int = 0

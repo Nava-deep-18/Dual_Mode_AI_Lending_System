@@ -1,14 +1,24 @@
-import React from 'react'
-import { Routes, Route, Link, useLocation } from 'react-router-dom'
+import React, { useContext } from 'react'
+import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom'
 import { Users, Activity } from 'lucide-react'
 import './index.css'
 import RuralApp from './RuralApp.jsx'
 import UrbanApp from './UrbanApp.jsx'
 import AuditDashboard from './AuditDashboard.jsx'
+import Login from './Login.jsx'
+import Signup from './Signup.jsx'
+import { AuthContext } from './AuthContext.jsx'
 
 const Navbar = () => {
   const location = useLocation();
   const path = location.pathname;
+  const { token, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <nav className="top-navbar">
@@ -20,19 +30,33 @@ const Navbar = () => {
       
       <div className="navbar-links">
         <Link to="/" className={path === '/' ? 'active' : ''}>Home</Link>
-        <Link to="/rural" className={path === '/rural' ? 'active' : ''}>Rural Engine</Link>
-        <Link to="/urban" className={path === '/urban' ? 'active' : ''}>Urban Bureau</Link>
-        <Link to="/compliance" className={path === '/compliance' ? 'active' : ''}>Compliance</Link>
+        {token && (
+          <>
+            <Link to="/rural" className={path === '/rural' ? 'active' : ''}>Rural Engine</Link>
+            <Link to="/urban" className={path === '/urban' ? 'active' : ''}>Urban Bureau</Link>
+            <Link to="/compliance" className={path === '/compliance' ? 'active' : ''}>Compliance</Link>
+          </>
+        )}
       </div>
 
       <div className="navbar-actions">
-        <button className="btn-login">Log in</button>
+        {token ? (
+           <button className="btn-login" onClick={handleLogout} style={{background: "transparent", color: "var(--neon-green)", border: "1px solid var(--neon-green)"}}>Log Out</button>
+        ) : (
+          <>
+           <Link to="/signup"><button className="btn-login" style={{background: "var(--neon-green)", color: "#111", marginRight: "10px"}}>Sign Up</button></Link>
+           <Link to="/login"><button className="btn-login">Log In</button></Link>
+          </>
+        )}
       </div>
     </nav>
   );
 };
 
-const DashboardHome = () => (
+const DashboardHome = () => {
+  const { token } = useContext(AuthContext);
+  
+  return (
   <div style={{ display: "flex", flexDirection: "column", maxWidth: "1200px", margin: "0 auto" }}>
     
     <div className="page-header" style={{ marginBottom: "2.5rem", textAlign: "center", marginTop: "0rem" }}>
@@ -53,7 +77,7 @@ const DashboardHome = () => (
             Evaluate high-risk, unbanked loan applicants using custom synthetic behavioral risk proxies (water access, social class, and collateral).
           </p>
         </div>
-        <Link to="/rural">
+        <Link to={token ? "/rural" : "/signup"}>
           <button className="btn-primary" style={{ width: "100%" }}>Launch Rural Engine</button>
         </Link>
       </div>
@@ -69,14 +93,15 @@ const DashboardHome = () => (
             Simulate enterprise JSON queries against national credit bureaus (CIBIL/Equifax) and apply 20+ feature overrides.
           </p>
         </div>
-        <Link to="/urban">
+        <Link to={token ? "/urban" : "/signup"}>
           <button className="btn-primary" style={{ width: "100%", background: "#111", color: "var(--neon-green)" }}>Launch Bureau Simulator</button>
         </Link>
       </div>
 
     </div>
   </div>
-);
+  );
+};
 
 const App = () => {
   return (
@@ -88,6 +113,8 @@ const App = () => {
           <Route path="/rural" element={<RuralApp />} />
           <Route path="/urban" element={<UrbanApp />} />
           <Route path="/compliance" element={<AuditDashboard />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
         </Routes>
       </div>
     </div>

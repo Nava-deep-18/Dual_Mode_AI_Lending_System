@@ -70,7 +70,7 @@ const UrbanApp = () => {
     setTimeout(() => {
       const data = MOCK_BUREAU_DB[searchId.toUpperCase()];
       if (data) {
-        setFormData({ ...data });
+        setFormData({ ...data, borrower_name: "" });
       } else {
         setError("Applicant ID not found in CIBIL index. Try 'ID-PRIME-001' or 'ID-RISK-002'.");
       }
@@ -82,12 +82,17 @@ const UrbanApp = () => {
     setFormData({ ...formData, [e.target.name]: parseFloat(e.target.value) });
   };
 
+  const handleDataChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
   const submitEvaluation = async () => {
     setEvaluating(true);
     setError("");
 
     try {
-      const response = await axios.post("http://127.0.0.1:8000/api/predict/urban", formData);
+      const payload = { ...formData, borrower_name: formData.borrower_name || "Anonymous" };
+      const response = await axios.post("http://127.0.0.1:8000/api/predict/urban", payload);
       setResult(response.data);
     } catch (err) {
       console.error(err);
@@ -131,6 +136,11 @@ const UrbanApp = () => {
                 <span style={{ fontSize: "0.8rem", color: "#10b981", background: "rgba(16, 185, 129, 0.2)", padding: "4px 8px", borderRadius: "12px" }}>Verified</span>
               </h3>
               
+              <div style={{ marginBottom: "15px" }}>
+                <label style={{ display: "block", marginBottom: "5px", color: "var(--text-muted)", fontSize: "0.85rem" }}>Borrower Name / Entity</label>
+                <input type="text" name="borrower_name" value={formData.borrower_name} onChange={handleDataChange} placeholder="e.g. John Doe" style={{ width: "100%", padding: "10px", borderRadius: "8px", background: "rgba(0,0,0,0.3)", border: "1px solid rgba(255,255,255,0.1)", color: "white" }} />
+              </div>
+
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", marginBottom: "1.5rem", maxHeight: "450px", overflowY: "auto", paddingRight: "10px" }}>
                 
                 {/* CORE BUREAU SCORES */}
@@ -300,6 +310,7 @@ const UrbanApp = () => {
                   <div>
                     <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", textTransform: "uppercase" }}>Corporate Max Limit</div>
                     <h3 style={{ fontSize: "1.25rem", marginTop: "5px", color: "white" }}>₹{result.max_loan_limit ? result.max_loan_limit.toLocaleString() : "0"}</h3>
+                    <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "4px" }}>*Mathematically projected via Bureau Ext_Source_Mean stability trackers.</div>
                   </div>
                   <div style={{ textAlign: "right" }}>
                     <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", textTransform: "uppercase" }}>AI Suggested Rate</div>

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 
 const RuralApp = () => {
   const [formData, setFormData] = useState({
+    borrower_name: "",
     annual_income: 45000,
     monthly_expenses: 1200,
     loan_installments: 800,
@@ -33,7 +34,18 @@ const RuralApp = () => {
     setResult(null);
 
     try {
-      const response = await axios.post("http://127.0.0.1:8000/api/predict/rural", formData);
+      const payload = {
+        ...formData,
+        borrower_name: formData.borrower_name || "Anonymous",
+        annual_income: Number(formData.annual_income),
+        monthly_expenses: Number(formData.monthly_expenses),
+        loan_installments: Number(formData.loan_installments),
+        young_dependents: Number(formData.young_dependents),
+        old_dependents: Number(formData.old_dependents),
+        home_ownership: Number(formData.home_ownership),
+        water_availabity: Number(formData.water_availabity)
+      };
+      const response = await axios.post("http://127.0.0.1:8000/api/predict/rural", payload);
       setResult(response.data);
     } catch (err) {
       console.error(err);
@@ -55,6 +67,12 @@ const RuralApp = () => {
           <h2 style={{ marginBottom: "1.5rem" }}>🌾 Rural Application Form</h2>
           <form onSubmit={submitEvaluation} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
             
+            <label>
+              <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "4px" }}>Borrower Name</div>
+              <input type="text" name="borrower_name" value={formData.borrower_name} onChange={handleChange} 
+                style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid var(--glass-border)", background: "transparent", color: "white" }} />
+            </label>
+
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
               <label>
                 <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "4px" }}>Annual Income (₹)</div>
@@ -198,6 +216,7 @@ const RuralApp = () => {
                   <div>
                     <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", textTransform: "uppercase" }}>Max Safe Limit</div>
                     <h3 style={{ fontSize: "1.25rem", marginTop: "5px", color: "white" }}>₹{result.max_loan_limit ? result.max_loan_limit.toLocaleString() : "0"}</h3>
+                    <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "4px" }}>*Capped at 40% of disposable monthly income across a 36-month standard term.</div>
                   </div>
                   <div style={{ textAlign: "right" }}>
                     <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", textTransform: "uppercase" }}>AI Suggested Rate</div>
