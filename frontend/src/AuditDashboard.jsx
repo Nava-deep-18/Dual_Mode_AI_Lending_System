@@ -13,7 +13,10 @@ const AuditDashboard = () => {
 
   const fetchHistory = async () => {
     try {
-      const resp = await axios.get("http://127.0.0.1:8000/api/history?limit=50");
+      const token = localStorage.getItem("access_token");
+      const resp = await axios.get("http://127.0.0.1:8000/api/history?limit=50", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       setRecords(resp.data);
     } catch (err) {
       console.error(err);

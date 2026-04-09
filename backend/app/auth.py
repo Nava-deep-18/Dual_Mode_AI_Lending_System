@@ -36,15 +36,25 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
+        if token is None:
+            print("AUTH DEBUG: Token is None")
+            raise credentials_exception
+            
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         email: str = payload.get("sub")
+        
         if email is None:
+            print("AUTH DEBUG: Email is None in payload")
             raise credentials_exception
-    except JWTError:
+    except JWTError as e:
+        print(f"AUTH DEBUG: JWTError: {e}")
         raise credentials_exception
+        
     user = db.query(User).filter(User.email == email).first()
     if user is None:
+        print(f"AUTH DEBUG: User with email {email} not found in DB")
         raise credentials_exception
+        
     return user
 
 @router.post("/signup", response_model=Token)
