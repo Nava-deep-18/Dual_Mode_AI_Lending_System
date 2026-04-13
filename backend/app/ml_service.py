@@ -198,9 +198,22 @@ class MLEngine:
         model_inputs = {feat: 0.0 for feat in self.rural_features}
         
         # 1. Calculate the critical Financial Ratios securely
+        # Step 1a: Compute EMI using Reducing Balance formula
+        # EMI = P × r × (1+r)^n / ((1+r)^n - 1)
+        # Use lender's own rate if provided, else fall back to 12% MFI base rate
+        annual_rate = raw.lender_interest_rate if raw.lender_interest_rate else 12.0
+        base_monthly_rate = annual_rate / 100.0 / 12.0
+        n = raw.loan_tenure_months
+        P = raw.loan_amount if raw.loan_amount else 0
+        if base_monthly_rate > 0 and n > 0 and P > 0:
+            calculated_emi = P * base_monthly_rate * ((1 + base_monthly_rate) ** n) / (((1 + base_monthly_rate) ** n) - 1)
+        else:
+            calculated_emi = P / max(n, 1)  # Fallback: flat split
+        calculated_emi = round(calculated_emi, 2)
+
         net_income = (raw.annual_income / 12.0) - raw.monthly_expenses
         net_income = max(net_income, 1.0) # Prevent division by zero
-        dti_ratio = raw.loan_installments / net_income
+        dti_ratio = calculated_emi / net_income
         total_dependents = raw.young_dependents + raw.old_dependents
         
         # 2. Map direct numeric outputs (if the model happens to require them)
@@ -210,8 +223,11 @@ class MLEngine:
         if "young_dependents" in model_inputs: model_inputs["young_dependents"] = raw.young_dependents
         if "old_dependents" in model_inputs: model_inputs["old_dependents"] = raw.old_dependents
         if "water_availabity" in model_inputs: model_inputs["water_availabity"] = float(raw.water_availabity)
-        if "loan_installments" in model_inputs: model_inputs["loan_installments"] = float(raw.loan_installments)
+        if "loan_installments" in model_inputs: model_inputs["loan_installments"] = calculated_emi
         if "home_ownership" in model_inputs: model_inputs["home_ownership"] = float(raw.home_ownership)
+        
+        # Store calculated_emi so predict_rural can access it
+        self._last_calculated_emi = calculated_emi
         
         # 3. Handle Categoricals natively (Checking Dropdowns)
         sc = str(raw.social_class).strip().upper()
@@ -303,9 +319,9 @@ class MLEngine:
                 break
             
         # 5. Apply Organic Guardrail Penalty (Dynamic Scaling)
-        # We scale the penalty based on EXACTLY how bad their cash flow deficit is.
         net_income = (human_raw.annual_income / 12.0) - human_raw.monthly_expenses
-        dti_ratio = human_raw.loan_installments / max(net_income, 1.0)
+        emi_used = getattr(self, '_last_calculated_emi', 0)
+        dti_ratio = emi_used / max(net_income, 1.0)
         
         if net_income <= 0:
             # If they are short by ₹450, we add a massive dynamic penalty!
@@ -335,7 +351,7 @@ class MLEngine:
         # Target Math for Dynamic Loan Caps and Rates
         net_income_calculated = (human_raw.annual_income / 12.0) - human_raw.monthly_expenses
         max_emi_capacity = max(net_income_calculated * 0.40, 0) # 40% of disposable
-        max_loan_limit = max_emi_capacity * 36 # Assumes standard 3-year microfinance term
+        max_loan_limit = max_emi_capacity * human_raw.loan_tenure_months # Based on actual tenure entered by lender
         
         # Real-world MFI (Microfinance) rates typically start at 12% up to 24% for unsecured lending
         base_rate = 12.0
@@ -356,6 +372,9 @@ class MLEngine:
             "decision": decision,
             "suggested_interest_rate": round(suggested_rate, 2),
             "max_loan_limit": round(max_loan_limit, 2),
+            "calculated_emi": getattr(self, '_last_calculated_emi', None),
+            "loan_tenure_months": human_raw.loan_tenure_months,
+            "lender_interest_rate": human_raw.lender_interest_rate,
             "shap_explanations": shaps_human
         }
 

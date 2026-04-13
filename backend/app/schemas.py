@@ -23,6 +23,9 @@ class PredictionResponse(BaseModel):
     decision: str
     suggested_interest_rate: Optional[float] = None
     max_loan_limit: Optional[float] = None
+    calculated_emi: Optional[float] = None
+    loan_tenure_months: Optional[int] = None
+    lender_interest_rate: Optional[float] = None
     shap_explanations: List[ShapExplanation]
 
 # --- RURAL HUMAN INPUT SCHEMA ---
@@ -32,7 +35,11 @@ class RuralHumanInput(BaseModel):
     borrower_name: str = "Anonymous"
     annual_income: float = Field(..., description="Annual Income in Rupees")
     monthly_expenses: float = Field(..., description="Monthly basic expenses")
-    loan_installments: float = Field(..., description="Proposed monthly loan EMI")
+    # Lender now enters the loan amount and tenure; EMI is computed by the backend
+    loan_amount: float = Field(..., description="Principal loan amount to be disbursed")
+    loan_tenure_months: int = Field(24, description="Repayment tenure in months")
+    # Optional: lender can set their own interest rate. If blank, AI suggestion is used.
+    lender_interest_rate: Optional[float] = Field(None, description="Lender's own annual interest rate in %")
     young_dependents: int = Field(0, description="Children or young dependents")
     old_dependents: int = Field(0, description="Elderly dependents")
     
@@ -45,14 +52,14 @@ class RuralHumanInput(BaseModel):
     loan_purpose: str = Field(..., description="Reason for loan")
     water_availabity: float = Field(1.0, description="1 for yes, 0 for no, 0.5 for partial")
 
-    @field_validator('annual_income', 'monthly_expenses', 'loan_installments', mode='before')
+    @field_validator('annual_income', 'monthly_expenses', 'loan_amount', 'lender_interest_rate', mode='before')
     def parse_financials(cls, value):
-        # Convert empty strings to 0
+        # Convert empty strings to None/0
         if value == "" or value is None:
-            return 0.0
+            return None
         return float(value)
         
-    @field_validator('young_dependents', 'old_dependents', mode='before')
+    @field_validator('young_dependents', 'old_dependents', 'loan_tenure_months', mode='before')
     def parse_dependents(cls, value):
         if value == "" or value is None:
             return 0

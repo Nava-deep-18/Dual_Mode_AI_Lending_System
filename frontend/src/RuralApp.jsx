@@ -7,7 +7,9 @@ const RuralApp = () => {
     borrower_name: "",
     annual_income: 45000,
     monthly_expenses: 1200,
-    loan_installments: 800,
+    loan_amount: 20000,
+    loan_tenure_months: 24,
+    lender_interest_rate: "",
     young_dependents: 1,
     old_dependents: 0,
     social_class: "OBC",
@@ -39,7 +41,9 @@ const RuralApp = () => {
         borrower_name: formData.borrower_name || "Anonymous",
         annual_income: Number(formData.annual_income),
         monthly_expenses: Number(formData.monthly_expenses),
-        loan_installments: Number(formData.loan_installments),
+        loan_amount: Number(formData.loan_amount),
+        loan_tenure_months: Number(formData.loan_tenure_months),
+        lender_interest_rate: formData.lender_interest_rate !== "" ? Number(formData.lender_interest_rate) : null,
         young_dependents: Number(formData.young_dependents),
         old_dependents: Number(formData.old_dependents),
         home_ownership: Number(formData.home_ownership),
@@ -88,20 +92,32 @@ const RuralApp = () => {
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
               <label>
-                <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "4px" }}>Expected EMI (₹)</div>
-                <input type="number" name="loan_installments" value={formData.loan_installments} onChange={handleChange} 
+                <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "4px" }}>Loan Amount (₹)</div>
+                <input type="number" name="loan_amount" value={formData.loan_amount} onChange={handleChange} 
                   style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid var(--glass-border)", background: "transparent", color: "white" }} />
               </label>
               <label>
-                <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "4px" }}>Dependents (Young/Old)</div>
-                <div style={{ display: "flex", gap: "4px" }}>
-                  <input type="number" name="young_dependents" value={formData.young_dependents} onChange={handleChange} 
-                    style={{ width: "50%", padding: "8px", borderRadius: "4px", border: "1px solid var(--glass-border)", background: "transparent", color: "white" }} />
-                  <input type="number" name="old_dependents" value={formData.old_dependents} onChange={handleChange} 
-                    style={{ width: "50%", padding: "8px", borderRadius: "4px", border: "1px solid var(--glass-border)", background: "transparent", color: "white" }} />
-                </div>
+                <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "4px" }}>Tenure (Months)</div>
+                <input type="number" name="loan_tenure_months" value={formData.loan_tenure_months} onChange={handleChange} 
+                  style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid var(--glass-border)", background: "transparent", color: "white" }} />
               </label>
             </div>
+
+            <label>
+              <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "4px" }}>Your Interest Rate % <span style={{ color: "var(--text-muted)", fontStyle: "italic" }}>(optional — leave blank to use AI suggestion)</span></div>
+              <input type="number" step="0.1" name="lender_interest_rate" value={formData.lender_interest_rate} onChange={handleChange} placeholder="e.g. 15"
+                style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid var(--neon-green)", background: "transparent", color: "white" }} />
+            </label>
+
+            <label>
+              <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "4px" }}>Dependents (Young/Old)</div>
+              <div style={{ display: "flex", gap: "4px" }}>
+                <input type="number" name="young_dependents" value={formData.young_dependents} onChange={handleChange} 
+                  style={{ width: "50%", padding: "8px", borderRadius: "4px", border: "1px solid var(--glass-border)", background: "transparent", color: "white" }} />
+                <input type="number" name="old_dependents" value={formData.old_dependents} onChange={handleChange} 
+                  style={{ width: "50%", padding: "8px", borderRadius: "4px", border: "1px solid var(--glass-border)", background: "transparent", color: "white" }} />
+              </div>
+            </label>
 
             <label>
               <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "4px" }}>Primary Business</div>
@@ -212,15 +228,34 @@ const RuralApp = () => {
                   </div>
                 </div>
 
-                <div style={{ marginTop: "1.5rem", paddingTop: "1.5rem", borderTop: "1px solid rgba(255,255,255,0.1)", display: "flex", justifyContent: "space-between" }}>
-                  <div>
-                    <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", textTransform: "uppercase" }}>Max Safe Limit</div>
-                    <h3 style={{ fontSize: "1.25rem", marginTop: "5px", color: "white" }}>₹{result.max_loan_limit ? result.max_loan_limit.toLocaleString() : "0"}</h3>
-                    <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "4px" }}>*Capped at 40% of disposable monthly income across a 36-month standard term.</div>
+                <div style={{ marginTop: "1.5rem", paddingTop: "1.5rem", borderTop: "1px solid rgba(255,255,255,0.1)" }}>
+                  
+                  {/* Calculated EMI Block */}
+                  <div style={{ background: "rgba(0,0,0,0.3)", borderRadius: "10px", padding: "15px", marginBottom: "15px" }}>
+                    <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", textTransform: "uppercase", marginBottom: "4px" }}>Calculated Monthly EMI</div>
+                    <div style={{ fontSize: "1.8rem", fontWeight: "bold", color: "var(--neon-green)" }}>₹{result.calculated_emi ? Math.round(result.calculated_emi).toLocaleString() : "—"}</div>
+                    <div style={{ fontSize: "0.78rem", color: "var(--text-muted)", marginTop: "4px" }}>
+                      {result.lender_interest_rate ? `Your rate: ${result.lender_interest_rate}%` : `Base rate: 12%`} · {result.loan_tenure_months} months · Reducing Balance Method
+                    </div>
                   </div>
-                  <div style={{ textAlign: "right" }}>
-                    <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", textTransform: "uppercase" }}>AI Suggested Rate</div>
-                    <h3 style={{ fontSize: "1.25rem", marginTop: "5px", color: "var(--neon-green)" }}>{result.suggested_interest_rate ? result.suggested_interest_rate.toFixed(2) : "0"}% APR</h3>
+
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                    <div>
+                      <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", textTransform: "uppercase" }}>
+                        {result.risk_score > 65 ? "⚠️ Restructure Suggestion" : result.risk_score > 35 ? "⚠️ Conditional Limit" : "✅ Approved Limit"}
+                      </div>
+                      <h3 style={{ fontSize: "1.25rem", marginTop: "5px", color: "white" }}>₹{result.max_loan_limit ? result.max_loan_limit.toLocaleString() : "0"}</h3>
+                      <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "4px" }}>*40% of disposable income × {result.loan_tenure_months} months</div>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", textTransform: "uppercase" }}>AI Suggested Rate</div>
+                      <h3 style={{ fontSize: "1.25rem", marginTop: "5px", color: result.lender_interest_rate && result.lender_interest_rate < result.suggested_interest_rate ? "#f59e0b" : "var(--neon-green)" }}>
+                        {result.suggested_interest_rate ? result.suggested_interest_rate.toFixed(1) : "0"}% APR
+                      </h3>
+                      {result.lender_interest_rate && result.lender_interest_rate < result.suggested_interest_rate && (
+                        <div style={{ fontSize: "0.75rem", color: "#f59e0b", marginTop: "2px" }}>⚠️ Your rate is below AI recommendation</div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
