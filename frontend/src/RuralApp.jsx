@@ -68,7 +68,7 @@ const RuralApp = () => {
         
         {/* LEFT COLUMN: Input Form */}
         <div className="glass-panel">
-          <h2 style={{ marginBottom: "1.5rem" }}>🌾 Rural Application Form</h2>
+          <h2 style={{ marginBottom: "1.5rem" }}>🌾 Microfinance Loan Assessment</h2>
           <form onSubmit={submitEvaluation} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
             
             <label>
@@ -109,15 +109,18 @@ const RuralApp = () => {
                 style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid var(--neon-green)", background: "transparent", color: "white" }} />
             </label>
 
-            <label>
-              <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "4px" }}>Dependents (Young/Old)</div>
-              <div style={{ display: "flex", gap: "4px" }}>
-                <input type="number" name="young_dependents" value={formData.young_dependents} onChange={handleChange} 
-                  style={{ width: "50%", padding: "8px", borderRadius: "4px", border: "1px solid var(--glass-border)", background: "transparent", color: "white" }} />
-                <input type="number" name="old_dependents" value={formData.old_dependents} onChange={handleChange} 
-                  style={{ width: "50%", padding: "8px", borderRadius: "4px", border: "1px solid var(--glass-border)", background: "transparent", color: "white" }} />
-              </div>
-            </label>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+              <label>
+                <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "4px" }}>Young Dependents</div>
+                <input type="number" name="young_dependents" value={formData.young_dependents} onChange={handleChange}
+                  style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid var(--glass-border)", background: "transparent", color: "white" }} />
+              </label>
+              <label>
+                <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "4px" }}>Old Dependents</div>
+                <input type="number" name="old_dependents" value={formData.old_dependents} onChange={handleChange}
+                  style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid var(--glass-border)", background: "transparent", color: "white" }} />
+              </label>
+            </div>
 
             <label>
               <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "4px" }}>Primary Business</div>
@@ -174,7 +177,6 @@ const RuralApp = () => {
                   <option value="OBC">OBC</option>
                   <option value="SC">SC</option>
                   <option value="ST">ST</option>
-                  <option value="Minority">Minority</option>
                 </select>
               </label>
               <label>

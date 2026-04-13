@@ -306,15 +306,18 @@ const UrbanApp = () => {
                   </div>
                 </div>
 
-                <div style={{ marginTop: "1.5rem", paddingTop: "1.5rem", borderTop: "1px solid rgba(255,255,255,0.1)", display: "flex", justifyContent: "space-between" }}>
-                  <div>
-                    <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", textTransform: "uppercase" }}>Corporate Max Limit</div>
-                    <h3 style={{ fontSize: "1.25rem", marginTop: "5px", color: "white" }}>₹{result.max_loan_limit ? result.max_loan_limit.toLocaleString() : "0"}</h3>
-                    <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "4px" }}>*Mathematically projected via Bureau Ext_Source_Mean stability trackers.</div>
+                <div style={{ marginTop: "1.5rem", paddingTop: "1.5rem", borderTop: "1px solid rgba(255,255,255,0.1)" }}>
+                  {/* Creditworthiness notice */}
+                  <div style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.3)", borderRadius: "8px", padding: "12px", marginBottom: "12px" }}>
+                    <div style={{ fontSize: "0.8rem", color: "#60a5fa", fontWeight: "600", marginBottom: "4px" }}>ℹ️ CREDITWORTHINESS ASSESSMENT ONLY</div>
+                    <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", lineHeight: "1.5" }}>
+                      This score reflects the borrower's probability of default based on bureau signals and repayment history — not their loan capacity. Loan sizing requires separate income verification (salary slips / ITR).
+                    </div>
                   </div>
                   <div style={{ textAlign: "right" }}>
                     <div style={{ fontSize: "0.85rem", color: "var(--text-muted)", textTransform: "uppercase" }}>AI Suggested Rate</div>
                     <h3 style={{ fontSize: "1.25rem", marginTop: "5px", color: "var(--neon-green)" }}>{result.suggested_interest_rate ? result.suggested_interest_rate.toFixed(2) : "0"}% APR</h3>
+                    <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "2px" }}>Risk-adjusted base rate (9.5% + premium)</div>
                   </div>
                 </div>
               </div>

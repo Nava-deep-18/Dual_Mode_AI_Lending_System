@@ -409,9 +409,6 @@ class MLEngine:
                 "reason": dict_ref["red_flag"] if direction == "HIGH RISK" else dict_ref["green_flag"]
             })
             
-        # Proxied math for commercial exposure
-        max_loan_limit = (bureau_raw.EXT_SOURCE_MEAN ** 2) * 2500000 # Max ₹25,00,000 corporate limit
-        
         # Realistic Urban Commercial banking starts around 9.5% 
         base_rate = 9.5
         risk_premium = min((prob / 100.0) * 10.5, 10.5) # Max out at 20%
@@ -429,7 +426,6 @@ class MLEngine:
             "risk_tier": tier,
             "decision": decision,
             "suggested_interest_rate": round(suggested_rate, 2),
-            "max_loan_limit": round(max_loan_limit, 2),
             "shap_explanations": shaps_human
         }
 
