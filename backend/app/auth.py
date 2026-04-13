@@ -10,7 +10,7 @@ from schemas import UserCreate, Token
 
 SECRET_KEY = "super-secret-bank-key-nexus-ai"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
 
 # OAuth2PasswordBearer tells FastAPI where the client should send the login to get a Token
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")

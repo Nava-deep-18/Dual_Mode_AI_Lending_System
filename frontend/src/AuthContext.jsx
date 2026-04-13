@@ -18,11 +18,24 @@ export const AuthProvider = ({ children }) => {
         setToken(newToken);
     };
 
-    const logout = () => {
+        const logout = () => {
         localStorage.removeItem('access_token');
         delete axios.defaults.headers.common['Authorization'];
         setToken(null);
     };
+
+    // Auto-logout if any API call returns 401 (expired token)
+    axios.interceptors.response.use(
+        (response) => response,
+        (error) => {
+            if (error.response?.status === 401) {
+                logout();
+                window.location.href = '/login';
+            }
+            return Promise.reject(error);
+        }
+    );
+
 
     return (
         <AuthContext.Provider value={{ token, login, logout }}>
