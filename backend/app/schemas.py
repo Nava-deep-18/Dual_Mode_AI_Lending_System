@@ -102,6 +102,10 @@ class UrbanBureauInput(BaseModel):
 class ActivateLoanRequest(BaseModel):
     """Body for POST /api/loans/{loan_id}/activate"""
     start_date: datetime.date = Field(..., description="Date from which the first EMI month begins")
+    disbursed_amount: Optional[float] = Field(
+        None,
+        description="Actual amount the officer chooses to disburse. Defaults to the originally requested loan_amount if not provided."
+    )
 
 class PaymentLogRequest(BaseModel):
     """Body for PATCH /api/loans/{loan_id}/payments/{month_number}"""

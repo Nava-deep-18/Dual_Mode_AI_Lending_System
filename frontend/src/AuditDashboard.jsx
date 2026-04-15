@@ -13,6 +13,7 @@ const AuditDashboard = () => {
   const [startDate, setStartDate] = useState('');
   const [activating, setActivating] = useState(false);
   const [activateMsg, setActivateMsg] = useState('');
+  const [disbursedAmount, setDisbursedAmount] = useState('');
 
   const navigate = useNavigate();
   const token = localStorage.getItem('access_token');
@@ -38,6 +39,8 @@ const AuditDashboard = () => {
     setActivateTarget(record);
     // Default start date = today
     setStartDate(new Date().toISOString().split('T')[0]);
+    // Pre-fill with requested amount; officer can override
+    setDisbursedAmount(record.loan_amount ?? '');
     setActivateMsg('');
   };
 
@@ -47,7 +50,7 @@ const AuditDashboard = () => {
     try {
       await axios.post(
         `http://127.0.0.1:8000/api/loans/${activateTarget.id}/activate`,
-        { start_date: startDate },
+        { start_date: startDate, disbursed_amount: Number(disbursedAmount) },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setActivateMsg('✅ Loan activated!');
@@ -213,8 +216,33 @@ const AuditDashboard = () => {
               <h3 style={{ color: 'var(--neon-green)', margin: 0 }}>Activate Loan</h3>
             </div>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
-              <strong style={{ color: 'white' }}>{activateTarget.borrower_name}</strong> · ₹{activateTarget.loan_amount?.toLocaleString()} · {activateTarget.loan_tenure_months} months
+              <strong style={{ color: 'white' }}>{activateTarget.borrower_name}</strong>
+              &nbsp;·&nbsp;{activateTarget.loan_tenure_months} months&nbsp;·&nbsp;{activateTarget.effective_rate?.toFixed(1)}% p.a.
             </p>
+
+            {/* Disbursed Amount — editable, pre-filled with requested amount */}
+            <label style={{ display: 'block', marginBottom: '1rem' }}>
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Disbursed Amount (₹)</div>
+              <input
+                type="number"
+                value={disbursedAmount}
+                onChange={e => setDisbursedAmount(e.target.value)}
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--neon-green)', background: 'rgba(0,0,0,0.4)', color: 'white', fontSize: '1rem', boxSizing: 'border-box' }}
+              />
+              {/* Show both hints side by side */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px', fontSize: '0.78rem' }}>
+                <span style={{ color: 'var(--text-muted)' }}>Requested: <strong style={{ color: 'white' }}>₹{activateTarget.loan_amount?.toLocaleString()}</strong></span>
+                {activateTarget.max_loan_limit && (
+                  <span
+                    style={{ color: 'var(--neon-green)', cursor: 'pointer', textDecoration: 'underline dotted' }}
+                    title="Click to use AI safe limit"
+                    onClick={() => setDisbursedAmount(activateTarget.max_loan_limit)}
+                  >
+                    AI safe limit: ₹{activateTarget.max_loan_limit?.toLocaleString()} ↖ use this
+                  </span>
+                )}
+              </div>
+            </label>
 
             <label>
               <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>First EMI Start Date</div>
@@ -227,8 +255,7 @@ const AuditDashboard = () => {
             </label>
 
             <div style={{ marginTop: '0.8rem', padding: '10px 14px', background: 'rgba(0,0,0,0.3)', borderRadius: '8px', fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-              Rate used: <strong style={{ color: 'var(--neon-green)' }}>{activateTarget.effective_rate?.toFixed(1)}%</strong> &nbsp;·&nbsp;
-              EMI will be auto-calculated using reducing balance method.
+              EMI will be auto-calculated on ₹<strong style={{ color: 'white' }}>{Number(disbursedAmount).toLocaleString()}</strong> using reducing balance method.
             </div>
 
             {activateMsg && (

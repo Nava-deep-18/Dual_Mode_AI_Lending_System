@@ -209,13 +209,16 @@ def activate_loan(
     if not loan.loan_amount or not loan.loan_tenure_months or not loan.effective_rate:
         raise HTTPException(status_code=400, detail="Loan amount, tenure, or rate missing — cannot generate schedule")
 
-    # Calculate EMI
-    emi = calculate_emi(loan.loan_amount, loan.effective_rate, loan.loan_tenure_months)
+    # Use the officer's chosen disbursed amount; fall back to requested amount
+    principal = body.disbursed_amount if body.disbursed_amount else loan.loan_amount
+
+    # Calculate EMI on the actual disbursed principal
+    emi = calculate_emi(principal, loan.effective_rate, loan.loan_tenure_months)
 
     # Create the schedule
     schedule = RepaymentSchedule(
         loan_record_id=loan.id,
-        principal=loan.loan_amount,
+        principal=principal,
         annual_rate=loan.effective_rate,
         tenure_months=loan.loan_tenure_months,
         monthly_emi=emi,
