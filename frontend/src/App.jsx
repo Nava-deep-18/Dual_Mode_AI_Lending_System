@@ -5,6 +5,7 @@ import './index.css'
 import RuralApp from './RuralApp.jsx'
 import UrbanApp from './UrbanApp.jsx'
 import AuditDashboard from './AuditDashboard.jsx'
+import RepaymentTracker from './RepaymentTracker.jsx'
 import Login from './Login.jsx'
 import Signup from './Signup.jsx'
 import { AuthContext } from './AuthContext.jsx'
@@ -148,6 +149,7 @@ const App = () => {
           <Route path="/rural" element={<RuralApp />} />
           <Route path="/urban" element={<UrbanApp />} />
           <Route path="/compliance" element={<AuditDashboard />} />
+          <Route path="/repayment/:loanId" element={<RepaymentTracker />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
         </Routes>

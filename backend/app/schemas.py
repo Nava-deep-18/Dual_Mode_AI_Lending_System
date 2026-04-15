@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional
+import datetime
 
 # --- AUTHENTICATION SCHEMAS ---
 class UserCreate(BaseModel):
@@ -94,3 +95,42 @@ class UrbanBureauInput(BaseModel):
 
     class Config:
         populate_by_name = True
+
+
+# --- REPAYMENT TRACKER SCHEMAS ---
+
+class ActivateLoanRequest(BaseModel):
+    """Body for POST /api/loans/{loan_id}/activate"""
+    start_date: datetime.date = Field(..., description="Date from which the first EMI month begins")
+
+class PaymentLogRequest(BaseModel):
+    """Body for PATCH /api/loans/{loan_id}/payments/{month_number}"""
+    paid_amount: float = Field(..., description="Amount actually paid by the borrower")
+    paid_date: datetime.date = Field(..., description="Date on which payment was received")
+
+class MonthlyPaymentResponse(BaseModel):
+    id: int
+    month_number: int
+    due_date: datetime.date
+    due_amount: float
+    paid_amount: Optional[float]
+    paid_date: Optional[datetime.date]
+    status: str
+
+    class Config:
+        from_attributes = True
+
+class RepaymentScheduleResponse(BaseModel):
+    id: int
+    loan_record_id: int
+    borrower_name: str
+    principal: float
+    annual_rate: float
+    tenure_months: int
+    monthly_emi: float
+    start_date: datetime.date
+    activated_at: datetime.datetime
+    payments: List[MonthlyPaymentResponse]
+
+    class Config:
+        from_attributes = True
