@@ -349,3 +349,37 @@ def log_payment(
         "paid_amount": payment.paid_amount,
         "due_amount": payment.due_amount,
     }
+
+
+@app.get("/api/schedule/calendar")
+def get_collection_calendar(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(auth.get_current_user)
+):
+    """
+    Returns all MonthlyPayment instances across all activated loans owned by the current user.
+    Used for the global EMI Collection Calendar.
+    """
+    payments = (
+        db.query(MonthlyPayment, LoanRecord.borrower_name, LoanRecord.id.label('loan_id'))
+        .join(RepaymentSchedule, MonthlyPayment.schedule_id == RepaymentSchedule.id)
+        .join(LoanRecord, RepaymentSchedule.loan_record_id == LoanRecord.id)
+        .filter(LoanRecord.owner_id == current_user.id)
+        .order_by(MonthlyPayment.due_date.asc())
+        .all()
+    )
+
+    result = []
+    for payment, borrower_name, loan_id in payments:
+        result.append({
+            "id": payment.id,
+            "loan_id": loan_id,
+            "borrower_name": borrower_name,
+            "month_number": payment.month_number,
+            "due_date": payment.due_date.isoformat(),
+            "due_amount": payment.due_amount,
+            "paid_amount": payment.paid_amount,
+            "status": payment.status
+        })
+    
+    return result

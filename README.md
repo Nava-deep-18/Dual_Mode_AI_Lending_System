@@ -136,6 +136,9 @@ graph TD
     *   Automatically generates reducing-balance EMI schedules.
     *   Allows officers to override disbursed loan amounts pre-generation based on AI "Safe Limit" suggestions.
     *   Logs tracking statuses (`PAID`, `PARTIAL`, `MISSED`) with visual health indicators.
+*   **Global EMI Collection Calendar**:
+    *   A full-width, interactive graphical calendar displaying all EMIs due across all activated loans.
+    *   Provides contextual pop-up modals revealing exact borrower details, colored status badges, and quick-routing "Track Action" buttons per date.
 *   **Immutable Audit Dashboard**: A complete historic ledger tracking who applied, who evaluated them, the raw JSON submitted, the score, and the final manual loan status.
 *   **Modern UI Engine**: A dark-mode, neon-accented UI built explicitly for low-fatigue high-data entry.
 
@@ -229,7 +232,12 @@ Ensure you have the following installed:
 ### 3. Activating a Repayment Schedule
 *   For any strictly **Approved Rural Loan**, click the **⚡ Activate** button in the Compliance table.
 *   Set the official **First EMI Date** and arbitrarily override the **Disbursed Amount** (The UI explicitly provides the AI Safe Limit as a clickable hint).
-*   Generate the schedule, and you will be routed to the Repayment Dashboard tracking all 24-36 months of the borrower's payments!
+*   Generate the schedule, and you will be routed to the Repayment Dashboard tracking all 24-36 months of the borrower's payments.
+
+### 4. Managing Collections via Global Calendar
+*   Select the **Calendar** tab in the main navigation.
+*   Review the global monthly grid. Days featuring due payments are flagged with contextual colored indicators (`Green` = all paid, `Yellow` = pending, `Red` = missed).
+*   Click any flagged date to trigger the **Details Overlay Modal**, which lists all borrowers due on that precise day alongside their exact status markers, and provides a direct routing button to fulfill collection.
 
 ---
 
