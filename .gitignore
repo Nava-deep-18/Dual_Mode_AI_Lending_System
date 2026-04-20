@@ -3,6 +3,8 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+Presentation_Cheat_Sheet.md
+
 # C extensions
 *.so
 
