@@ -20,7 +20,7 @@ const CollectionCalendar = () => {
 
   const fetchCalendarData = async () => {
     try {
-      const res = await axios.get("http://127.0.0.1:8000/api/schedule/calendar", {
+      const res = await axios.get("/api/schedule/calendar", {
         headers: { Authorization: `Bearer ${token}` }
       });
       setPayments(res.data);

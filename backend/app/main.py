@@ -1,14 +1,14 @@
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from schemas import (
+from .schemas import (
     RuralHumanInput, UrbanBureauInput, PredictionResponse,
     ActivateLoanRequest, PaymentLogRequest, RepaymentScheduleResponse
 )
-from ml_service import ml_engine
-from database import engine, get_db, Base
-from models import LoanRecord, User, RepaymentSchedule, MonthlyPayment
+from .ml_service import ml_engine
+from .database import engine, get_db, Base
+from .models import LoanRecord, User, RepaymentSchedule, MonthlyPayment
 from sqlalchemy.orm import Session
-import auth
+from . import auth
 import json
 import math
 import datetime

@@ -24,7 +24,7 @@ const AuditDashboard = () => {
 
   const fetchHistory = async () => {
     try {
-      const resp = await axios.get('http://127.0.0.1:8000/api/history?limit=50', {
+      const resp = await axios.get('/api/history?limit=50', {
         headers: { Authorization: `Bearer ${token}` },
       });
       setRecords(resp.data);
@@ -49,7 +49,7 @@ const AuditDashboard = () => {
     setActivateMsg('');
     try {
       await axios.post(
-        `http://127.0.0.1:8000/api/loans/${activateTarget.id}/activate`,
+        `/api/loans/${activateTarget.id}/activate`,
         { start_date: startDate, disbursed_amount: Number(disbursedAmount) },
         { headers: { Authorization: `Bearer ${token}` } }
       );

@@ -4,9 +4,9 @@ from sqlalchemy.orm import Session
 import hashlib
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
-from database import get_db
-from models import User
-from schemas import UserCreate, Token
+from .database import get_db
+from .models import User
+from .schemas import UserCreate, Token
 
 SECRET_KEY = "super-secret-bank-key-nexus-ai"
 ALGORITHM = "HS256"

@@ -14,7 +14,7 @@ const Signup = () => {
     e.preventDefault();
     setError(null);
     try {
-      const res = await axios.post("http://127.0.0.1:8000/auth/signup", { email, password });
+      const res = await axios.post("/auth/signup", { email, password });
       login(res.data.access_token);
       navigate('/');
     } catch (err) {

@@ -24,7 +24,7 @@ const RepaymentTracker = () => {
 
   const fetchSchedule = async () => {
     try {
-      const resp = await axios.get(`http://127.0.0.1:8000/api/loans/${loanId}/schedule`, {
+      const resp = await axios.get(`/api/loans/${loanId}/schedule`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setSchedule(resp.data);
@@ -52,7 +52,7 @@ const RepaymentTracker = () => {
     setSaveMsg('');
     try {
       await axios.patch(
-        `http://127.0.0.1:8000/api/loans/${loanId}/payments/${logModal.month_number}`,
+        `/api/loans/${loanId}/payments/${logModal.month_number}`,
         { paid_amount: Number(logForm.paid_amount), paid_date: logForm.paid_date },
         { headers: { Authorization: `Bearer ${token}` } }
       );

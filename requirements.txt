@@ -5,8 +5,9 @@ pydantic
 python-jose[cryptography]
 python-multipart
 pandas
-numpy
+numpy<2.4
 xgboost
 shap
 joblib
 scikit-learn
+psycopg2-binary

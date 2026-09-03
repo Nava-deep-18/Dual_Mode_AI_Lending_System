@@ -19,7 +19,7 @@ const Login = () => {
       formData.append('username', email); 
       formData.append('password', password);
       
-      const res = await axios.post("http://127.0.0.1:8000/auth/login", formData);
+      const res = await axios.post("/auth/login", formData);
       login(res.data.access_token);
       navigate('/');
     } catch (err) {

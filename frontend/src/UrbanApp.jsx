@@ -92,7 +92,7 @@ const UrbanApp = () => {
 
     try {
       const payload = { ...formData, borrower_name: formData.borrower_name || "Anonymous" };
-      const response = await axios.post("http://127.0.0.1:8000/api/predict/urban", payload);
+      const response = await axios.post("/api/predict/urban", payload);
       setResult(response.data);
     } catch (err) {
       console.error(err);

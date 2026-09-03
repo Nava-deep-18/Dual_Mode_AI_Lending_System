@@ -49,7 +49,7 @@ const RuralApp = () => {
         home_ownership: Number(formData.home_ownership),
         water_availabity: Number(formData.water_availabity)
       };
-      const response = await axios.post("http://127.0.0.1:8000/api/predict/rural", payload);
+      const response = await axios.post("/api/predict/rural", payload);
       setResult(response.data);
     } catch (err) {
       console.error(err);

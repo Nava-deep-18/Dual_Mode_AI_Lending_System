@@ -3,7 +3,7 @@ import json
 import os
 import pandas as pd
 import shap
-from schemas import RuralHumanInput
+from .schemas import RuralHumanInput
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODELS_DIR = os.path.join(BASE_DIR, "ml_models")
