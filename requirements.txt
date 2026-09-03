@@ -11,3 +11,4 @@ shap
 joblib
 scikit-learn
 psycopg2-binary
+python-dotenv
