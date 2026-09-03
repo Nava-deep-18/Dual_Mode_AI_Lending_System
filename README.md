@@ -4,11 +4,12 @@
 
 **A Deterministic Financial Evaluation System augmented by Explainable AI (XAI)**
 
+[![Live Demo](https://img.shields.io/badge/Live%20App-Vercel-d4ff70?style=for-the-badge&logo=vercel&logoColor=black)](https://dual-mode-ai-lending-system.vercel.app/)
 [![FastAPI](https://img.shields.io/badge/Powered%20by-FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/Frontend-React-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
 [![XGBoost](https://img.shields.io/badge/ML-XGBoost-blue?style=for-the-badge)](https://xgboost.readthedocs.io/)
 [![SHAP](https://img.shields.io/badge/XAI-SHAP_Explanations-orange?style=for-the-badge)](https://shap.readthedocs.io/)
-[![SQLite](https://img.shields.io/badge/Database-SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)](https://www.sqlite.org/)
+[![Supabase](https://img.shields.io/badge/Database-Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
 
 *Combining high-performance credit modeling with human-readable transparency.*
 
