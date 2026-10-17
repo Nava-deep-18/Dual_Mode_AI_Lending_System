@@ -22,6 +22,8 @@
 1. [Project Overview](#-project-overview)
 2. [Design Philosophy](#-design-philosophy)
 3. [Data & ML Pipeline](#-data--ml-pipeline)
+   - [Urban Feature Dictionary (Full 7-CSV Guide)](Urban_Data_Dictionary.md)
+   - [Presentation Feature Cheat Sheet](Presentation_Cheat_Sheet.md)
 4. [System Architecture](#-system-architecture)
 5. [Key Features](#-key-features)
 6. [Tech Stack](#-tech-stack)
@@ -58,6 +60,8 @@ Our system is built around core principles prioritizing transparency and fair ac
 ## 🔄 Data & ML Pipeline
 
 The system is built on a robust machine learning pipeline that transforms raw tabular data into highly accurate risk assessments.
+
+> 📘 **Full Feature Reference**: For an exhaustive, column-by-column breakdown of all 7 Urban relational CSVs and 219 raw features, see [`Urban_Data_Dictionary.md`](Urban_Data_Dictionary.md). For presentation slider tips, see [`Presentation_Cheat_Sheet.md`](Presentation_Cheat_Sheet.md).
 
 ### 1. Exploratory Data Analysis & Cleaning
 **Source**: `notebooks/01_EDA_and_Cleaning.ipynb`
@@ -244,18 +248,20 @@ Ensure you have the following installed:
 
 ## 📦 Project Structure
 
-```
-Dual_Mode_AI_Lending_System/
+├── Urban_Data_Dictionary.md   # Exhaustive guide to all 7 Urban CSVs & 219 features
+├── Presentation_Cheat_Sheet.md# Quick guide for explaining sliders & features
+├── requirements.txt           # Python dependencies
+├── README.md
+│
 ├── backend/
 │   ├── app/
 │   │   ├── main.py            # FastAPI entry point & core routes
 │   │   ├── models.py          # SQLAlchemy database models
 │   │   ├── schemas.py         # Pydantic models for validation
-│   │   ├── database.py        # SQLite connection setup
+│   │   ├── database.py        # SQLite / Supabase connection setup
 │   │   ├── auth.py            # JWT Authentication logic
-│   │   └── ml_service/        # Machine Learning operations
-│   │       ├── ml_engine.py   # XGBoost & SHAP evaluation logic
-│   │       └── models/        # Pre-trained XGBoost weights (.pkl)
+│   │   └── ml_service.py      # XGBoost & SHAP evaluation logic
+│   ├── ml_models/             # Pre-trained models (.joblib) & feature JSONs
 │   ├── requirements.txt
 │   └── lending_app.db         # Auto-generated SQLite database
 │
@@ -266,11 +272,12 @@ Dual_Mode_AI_Lending_System/
 │   │   ├── UrbanApp.jsx       # Urban Bureau Simulator
 │   │   ├── AuditDashboard.jsx # Compliance & History Tracker
 │   │   ├── RepaymentTracker.jsx # EMI & Payment schedules
+│   │   ├── CollectionCalendar.jsx # Global monthly EMI calendar
 │   │   ├── Login.jsx / Signup.jsx
 │   │   ├── AuthContext.jsx    # Global state for JWT tokens
 │   │   └── index.css          # Custom styling
 │   ├── package.json
-│   └── vite.config.js         # (if using Vite)
+│   └── vite.config.js
 ```
 
 ---
