@@ -10,5 +10,6 @@ xgboost
 shap
 joblib
 scikit-learn
+psycopg[binary]
 psycopg2-binary
 python-dotenv
